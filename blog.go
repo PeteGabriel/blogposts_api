@@ -7,23 +7,25 @@ import (
 	"github.com/petegabriel/personalblog/posts"
 )
 
-type post struct {
-	Title string `json:"title"`
-	Body string `json:"body"`
+type Post struct {
+	Title string `form:"title" json:"title" binding:"required"`
+	Body  string `form:"body" json:"body" binding:"required"`
 }
-
 
 func main() {
 	r := gin.Default()
 
-	r.GET("/posts", func(c *gin.Context) {
-		c.JSON(http.StatusOK,  posts.GetBlogPosts())
-	})
+	r.GET("/posts", GetPostsHandler())
 
-	r.POST("/posts", func(c *gin.Context) {
-		var post post
-		err := c.BindJSON(&post)
-		if err != nil {
+	r.POST("/posts", NewPostHandler())
+
+	_ = r.Run()
+}
+
+func NewPostHandler() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var post Post
+		if err := c.BindJSON(&post); err != nil {
 			c.String(http.StatusBadRequest, err.Error())
 		}
 
@@ -35,7 +37,13 @@ func main() {
 		if created {
 			c.String(http.StatusCreated, "created")
 		}
-	})
-
-	r.Run()
+	}
 }
+
+func GetPostsHandler() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		c.JSON(http.StatusOK, posts.GetBlogPosts())
+	}
+}
+
+

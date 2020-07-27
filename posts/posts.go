@@ -6,11 +6,12 @@ import (
 )
 
 type BlogPost struct {
-	Title string `json:"title"`
-	Body string `json:"body"`
-	Date time.Time `json:"created"`
+	Title   string      `json:"title"`
+	Body    string      `json:"body"`
+	Date    time.Time   `json:"created"`
+	Id      int         `json:"id"`
 }
-var posts = make([]BlogPost, 10)
+var posts = make([]BlogPost, 1, 10)
 
 func New(title, body string) BlogPost {
 	return BlogPost{
@@ -21,7 +22,7 @@ func New(title, body string) BlogPost {
 }
 
 func GetBlogPosts() []BlogPost{
-	return posts[:10]
+	return posts[:]
 }
 
 func CreateNewPost(title, body string) (bool, error) {
@@ -32,6 +33,10 @@ func CreateNewPost(title, body string) (bool, error) {
 		return false, errors.New("body must not be empty")
 	}
 
-	posts[len(posts)-1] = New(title, body)
+	idx := 0
+	if len(posts) > 0 {
+		idx = len(posts)-1
+	}
+	posts[idx] = New(title, body)
 	return true, nil
 }

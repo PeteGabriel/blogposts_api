@@ -11,7 +11,7 @@ type BlogPost struct {
 	Date    time.Time   `json:"created"`
 	Id      int         `json:"id"`
 }
-var posts = make([]BlogPost, 1, 10)
+var posts = make([]BlogPost, 0)
 
 func New(title, body string) BlogPost {
 	return BlogPost{
@@ -33,10 +33,9 @@ func CreateNewPost(title, body string) (bool, error) {
 		return false, errors.New("body must not be empty")
 	}
 
-	idx := 0
-	if len(posts) > 0 {
-		idx = len(posts)-1
+	if posts == nil {
+		posts = make([]BlogPost, 0)
 	}
-	posts[idx] = New(title, body)
+	posts = append(posts, New(title, body))
 	return true, nil
 }

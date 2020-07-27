@@ -26,7 +26,7 @@ func TestGetPostsHandler(t *testing.T){
 	router.ServeHTTP(w, req)
 
 	is.Equal(200, w.Code)
-	is.Equal("[{\"title\":\"\",\"body\":\"\",\"created\":\"0001-01-01T00:00:00Z\",\"id\":0}]", w.Body.String())
+	is.Equal("[]", w.Body.String())
 }
 
 func TestNewPostHandler(t *testing.T){
@@ -39,7 +39,6 @@ func TestNewPostHandler(t *testing.T){
 	router.ServeHTTP(w, req)
 	is.Equal(201, w.Code)
 	is.Equal("created", w.Body.String())
-
 }
 
 func TestNewPostHandler_WithIncorrectBody(t *testing.T){

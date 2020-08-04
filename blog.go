@@ -13,6 +13,7 @@ type Post struct {
 }
 
 func main() {
+
 	r := gin.Default()
 
 	r.GET("/posts", GetPostsHandler())
@@ -29,14 +30,12 @@ func NewPostHandler() func(c *gin.Context) {
 			c.String(http.StatusBadRequest, err.Error())
 		}
 
-		created, err := posts.CreateNewPost(post.Title, post.Body)
-
-		if err != nil {
+		if _, err := posts.CreateNewPost(post.Title, post.Body); err != nil {
 			c.String(http.StatusBadRequest, err.Error())
+			return
 		}
-		if created {
-			c.String(http.StatusCreated, "created")
-		}
+
+		c.String(http.StatusCreated, "created")
 	}
 }
 

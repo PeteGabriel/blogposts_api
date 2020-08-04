@@ -8,8 +8,8 @@ import (
 type BlogPost struct {
 	Title   string      `json:"title"`
 	Body    string      `json:"body"`
-	Date    time.Time   `json:"created"`
-	Id      int         `json:"id"`
+	Id      int       `json:"id"`
+	Date    time.Time   `json:"date"`
 }
 var posts = make([]BlogPost, 0)
 
@@ -17,7 +17,7 @@ func New(title, body string) BlogPost {
 	return BlogPost{
 		Title:title,
 		Body:body,
-		Date: time.Now(),
+		Date: time.Now().UTC(),
 	}
 }
 

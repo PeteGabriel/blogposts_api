@@ -2,8 +2,11 @@ package infra
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -43,7 +46,20 @@ func fetch() *pgxpool.Conn {
 	return c
 }
 
-func Save(pst *posts.BlogPost) (int, error){
+/**
+Save a post in the database.
+ */
+func Save(pst posts.BlogPost) (int, error){
+	//validate fields
+	if strings.Compare(pst.Title, "") == 0 {
+		log.Println("tried to save a post without field title")
+		return -1, errors.New("a post must have a title")
+	}
+	if strings.Compare(pst.Body, "") == 0 {
+		log.Println("tried to save a post without field body")
+		return -1, errors.New("a post must have a body")
+	}
+
 	con := fetch()
 	defer con.Conn().Close(context.Background())
 
@@ -61,6 +77,9 @@ func Save(pst *posts.BlogPost) (int, error){
 	return id, nil
 }
 
+/**
+Get a post by its id.
+ */
 func Get(i int) (*posts.BlogPost, error) {
 	qry := `select title, body, id, date from posts where id=$1;`
 	var body, title string
@@ -73,7 +92,8 @@ func Get(i int) (*posts.BlogPost, error) {
 	row := con.Conn().QueryRow(context.Background(), qry, i)
 
 	if err:= row.Scan(&title, &body, &id, &date); err != nil {
-		return nil, err
+		log.Println(err)
+		return nil, errors.New(fmt.Sprintf("post with id %d not found", i))
 	}
 	return &posts.BlogPost{
 		Title: title,

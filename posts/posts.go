@@ -2,30 +2,22 @@ package posts
 
 import (
 	"errors"
-	"time"
+	"log"
+
+	"github.com/petegabriel/personalblog/infra"
 )
 
-type BlogPost struct {
-	Title   string      `json:"title"`
-	Body    string      `json:"body"`
-	Id      int         `json:"id"`
-	Date    time.Time   `json:"date"`
-}
-var posts = make([]BlogPost, 0)
 
-func New(title, body string) BlogPost {
-	return BlogPost{
-		Title:title,
-		Body:body,
-		Date: time.Now().UTC(),
-	}
+
+
+func All() []infra.BlogPost {
+	return infra.All()
 }
 
-func GetBlogPosts() []BlogPost{
-	return posts[:]
-}
-
-func CreateNewPost(title, body string) (bool, error) {
+/**
+Save a new post with given title and body.
+*/
+func Save(title, body string) (bool, error) {
 	if title == "" {
 		return false, errors.New("title must not be empty")
 	}
@@ -33,9 +25,11 @@ func CreateNewPost(title, body string) (bool, error) {
 		return false, errors.New("body must not be empty")
 	}
 
-	if posts == nil {
-		posts = make([]BlogPost, 0)
+
+	id, err := infra.Save(title, body)
+	if err != nil {
+		log.Println(err)
+		return false, err
 	}
-	posts = append(posts, New(title, body))
-	return true, nil
+	return id > 0, nil
 }

@@ -30,7 +30,7 @@ func NewPostHandler() func(c *gin.Context) {
 			c.String(http.StatusBadRequest, err.Error())
 		}
 
-		if _, err := posts.CreateNewPost(post.Title, post.Body); err != nil {
+		if _, err := posts.Save(post.Title, post.Body); err != nil {
 			c.String(http.StatusBadRequest, err.Error())
 			return
 		}
@@ -39,9 +39,10 @@ func NewPostHandler() func(c *gin.Context) {
 	}
 }
 
+
 func GetPostsHandler() func(c *gin.Context) {
 	return func(c *gin.Context) {
-		c.JSON(http.StatusOK, posts.GetBlogPosts())
+		c.JSON(http.StatusOK, posts.All())
 	}
 }
 

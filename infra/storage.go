@@ -11,14 +11,13 @@ import (
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/joho/godotenv"
-	"github.com/petegabriel/personalblog/posts"
 )
 
 var pool *pgxpool.Pool
 
 //init pool
 func init() {
-	err := godotenv.Load("../.env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error loading .env file: %v\n", err)
 		os.Exit(1)
@@ -49,25 +48,26 @@ func fetch() *pgxpool.Conn {
 /**
 Save a post in the database.
  */
-func Save(pst posts.BlogPost) (int, error){
+func Save(title, body string) (int, error){
 	//validate fields
-	if strings.Compare(pst.Title, "") == 0 {
+	if strings.Compare(title, "") == 0 {
 		log.Println("tried to save a post without field title")
 		return -1, errors.New("a post must have a title")
 	}
-	if strings.Compare(pst.Body, "") == 0 {
+	if strings.Compare(body, "") == 0 {
 		log.Println("tried to save a post without field body")
 		return -1, errors.New("a post must have a body")
 	}
 
 	con := fetch()
-	defer con.Conn().Close(context.Background())
+	defer con.Release()
 
 
 	qry := `INSERT INTO posts (title, body, date) 
                      VALUES ($1, $2, $3) 
                      RETURNING id`
 	var id = 0
+	pst := New(title, body)
 	err := con.Conn().QueryRow(context.Background(), qry, pst.Title, pst.Body, pst.Date).Scan(&id)
 	if err != nil {
 		return -1, err
@@ -80,14 +80,14 @@ func Save(pst posts.BlogPost) (int, error){
 /**
 Get a post by its id.
  */
-func Get(i int) (*posts.BlogPost, error) {
+func Get(i int) (*BlogPost, error) {
 	qry := `select title, body, id, date from posts where id=$1;`
 	var body, title string
 	var id int
 	var date time.Time
 
 	con := fetch()
-	defer con.Conn().Close(context.Background())
+	defer con.Release()
 
 	row := con.Conn().QueryRow(context.Background(), qry, i)
 
@@ -95,10 +95,45 @@ func Get(i int) (*posts.BlogPost, error) {
 		log.Println(err)
 		return nil, errors.New(fmt.Sprintf("post with id %d not found", i))
 	}
-	return &posts.BlogPost{
+	return &BlogPost{
 		Title: title,
 		Body:  body,
 		Id:    id,
 		Date:  date,
 	}, nil
+}
+
+func All() []BlogPost {
+	qry := "select title, body, id, date from posts;"
+	con := fetch()
+	defer con.Release()
+
+	rows, err := con.Conn().Query(context.Background(), qry)
+	if err != nil {
+
+	}
+	var posts []BlogPost
+	defer rows.Close()
+	for rows.Next() {
+		var body, title string
+		var id int
+		var date time.Time
+		if err:= rows.Scan(&title, &body, &id, &date); err != nil {
+			log.Println(err)
+		}
+		p := BlogPost{
+			Title: title,
+			Body:  body,
+			Id:    id,
+			Date:  date,
+		}
+		posts = append(posts, p)
+	}
+	err = rows.Err()
+	if err != nil {
+		//TODO handle it better
+		panic(err)
+	}
+
+	return posts
 }

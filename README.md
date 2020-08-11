@@ -6,7 +6,7 @@
 
 ### Run tests:
 
-You can use the PSQL docker image made for this purpose [here](https://hub.docker.com/repository/docker/petegabriel/microblog_psql/general). 
+You can use the PSQL docker image made for this purpose [here](https://hub.docker.com/r/petegabriel/microblog_psql). 
 
 Also, something like `postgresql://gopher:myscretpassword@localhost:5432/microblog` as de DB connection string.
   

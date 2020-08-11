@@ -17,7 +17,7 @@ var pool *pgxpool.Pool
 
 //init pool
 func init() {
-	err := godotenv.Load(".env")
+	err := godotenv.Load(os.Getenv("ENV_PATH"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error loading .env file: %v\n", err)
 		os.Exit(1)
@@ -129,10 +129,10 @@ func All() []BlogPost {
 		}
 		posts = append(posts, p)
 	}
+
 	err = rows.Err()
 	if err != nil {
-		//TODO handle it better
-		panic(err)
+		log.Println(err)
 	}
 
 	return posts

@@ -20,7 +20,6 @@ func init() {
 	err := godotenv.Load(os.Getenv("ENV_PATH"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error loading .env file: %v\n", err)
-		os.Exit(1)
 	}
 
 	pp, err := pgxpool.Connect(context.Background(), os.Getenv("DATABASE_URI"))

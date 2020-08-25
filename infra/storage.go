@@ -22,7 +22,7 @@ func init() {
 		fmt.Fprintf(os.Stderr, "error loading .env file: %v\n", err)
 	}
 
-	pp, err := pgxpool.Connect(context.Background(), os.Getenv("DATABASE_URI"))
+	pp, err := pgxpool.Connect(context.Background(), os.Getenv("DB_URL"))
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
@@ -107,11 +107,13 @@ func All() []BlogPost {
 	con := fetch()
 	defer con.Release()
 
+	var posts []BlogPost
 	rows, err := con.Conn().Query(context.Background(), qry)
 	if err != nil {
-
+		log.Println("could not query for all posts")
+		return posts
 	}
-	var posts []BlogPost
+
 	defer rows.Close()
 	for rows.Next() {
 		var body, title string

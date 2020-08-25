@@ -1,7 +1,7 @@
 
 ### The API expects the following environment variables:
 
-* _DATABASE_URI_ - postgres db connection string. 
+* _DB_URL_ - postgres db connection string. 
 
 
 ### Run tests:

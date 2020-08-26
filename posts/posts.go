@@ -7,11 +7,25 @@ import (
 	"github.com/petegabriel/personalblog/infra"
 )
 
+/**
+All posts.
+ */
+func All(page int) []infra.BlogPost {
+	all := infra.All()
+	if page == 1 {
+		if len(all) > 10 {
+			return all[:10]
+		}else {
+			return all
+		}
+	}
 
-
-
-func All() []infra.BlogPost {
-	return infra.All()
+	i := page * 10
+	if len(all) > i {
+		return all[i:i+10]
+	}else {
+		return all
+	}
 }
 
 /**
@@ -32,4 +46,15 @@ func Save(title, body string) (bool, error) {
 		return false, err
 	}
 	return id > 0, nil
+}
+
+/**
+Get a post by its id.
+ */
+func GetById( id int) (*infra.BlogPost, error){
+	p, err := infra.Get(id)
+	if err != nil {
+		return nil, err
+	}
+	return p, nil
 }

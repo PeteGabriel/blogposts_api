@@ -29,9 +29,18 @@ func TestCreateNewPost_WithEmptyBody(t *testing.T){
 	i.True(err != nil)
 }
 
-func TestCreateNewPost_WithEmptyDatay(t *testing.T){
+func TestCreateNewPost_WithEmptyData(t *testing.T){
 	i := is.New(t)
 	created, err := Save("", "")
 	i.True(!created)
 	i.True(err != nil)
+}
+
+func TestAllPosts(t *testing.T){
+	i := is.New(t)
+	posts := All(1)
+	i.True(len(posts) > 1)
+
+	posts = All(2)
+	i.True(len(posts) > 1)
 }

@@ -17,6 +17,8 @@ func main() {
 
 	r := gin.Default()
 
+	r.GET("/", RedirectHandler())
+
 	r.GET("/posts", GetPostsHandler())
 
 	r.GET("/posts/:id", GetPostByIdHandler())
@@ -24,6 +26,12 @@ func main() {
 	r.POST("/posts", NewPostHandler())
 
 	_ = r.Run()
+}
+
+func RedirectHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Redirect(http.StatusFound, "/posts")
+	}
 }
 
 func GetPostByIdHandler() gin.HandlerFunc {
